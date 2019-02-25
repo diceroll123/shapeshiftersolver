@@ -5,7 +5,9 @@
 
 function getDeltas() {
     var pieces = {};
-    $("table[border=1][bordercolor='gray']").find("img[name='i_']:not(:first)").each(function(k,v) {
+    var items = $("table[border=1][bordercolor='gray']").find("img[name='i_']:not(:last)").get();
+    items.splice(0, 0, items.pop());
+    $(items).each(function(k,v) {
         pieces[$(v).attr("src").substr(0,52)] = k; // use substr up to 52 just in case mouseover is triggered
     });
     return pieces;
@@ -48,9 +50,13 @@ function getBoard() {
     return "board = Board('" + lines.join() + "', " + (Object.keys(deltas).length - 1) + ")";
 }
 
-var board = getBoard();
-var shapes = getShapes();
+$("#copy").live( "click", function() {
+    var $temp = $("<textarea>");
+    $("body").append($temp);
+    $temp.val(getBoard() +"\n" + getShapes()).select();
+    document.execCommand("copy");
+    $temp.remove();
+    $("#copy").fadeOut();
+});
 
-if(shapes !== null) {
-    $(".content").prepend("<center><textarea rows='4' cols='100'>" + board + "\n" + shapes + "</textarea></center>");
-}
+$("table[border=1][bordercolor='gray']").after("<p><center><button id='copy'>Copy Board Code</button></center>");
